@@ -1,12 +1,11 @@
 #![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 mod weather;
 mod redsox;
-use tabled::Table;
+use tabled::{Table, Tabled};
+use serde::{Deserialize, Serialize};
 use tabled::settings::{
     peaker::Priority, Width, Style, Alignment, object::Columns
 };
-use serde::{Deserialize, Serialize};
-use tabled::Tabled;
 
 #[derive(Serialize, Deserialize, Debug, Tabled)]
 #[tabled(rename_all = "UPPERCASE")]
@@ -21,7 +20,6 @@ struct TableRow {
 #[allow(unreachable_code)]
 fn main() {
     let baseball_diamond = '\u{f15ec}';
-    let sunny = '\u{f0599}';
     // Set the weather location here.
     let location = weather::WeatherOfficeLocation {
         x: 75,
@@ -48,19 +46,17 @@ fn main() {
                 break;
             }
         }
-        let mut forecast_w_icon = String::new();
-        forecast_w_icon.push(sunny);
-        forecast_w_icon.push_str(" ");
-        forecast_w_icon.push_str(&item.detailed_forecast);
         let row = TableRow {
             date: date.to_string(),
             time_of_day: item.name.clone(),
             temp: item.temperature,
             red_sox: sox_status,
-            forecast: forecast_w_icon,
+            forecast: item.detailed_forecast.to_string(),
         };
         table_rows.push(row);
     }
+
+    // here is where we actually render the table.
     let mut table = Table::new(table_rows);
     table.with(Style::modern());
     table.with((
