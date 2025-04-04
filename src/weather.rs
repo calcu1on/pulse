@@ -53,18 +53,12 @@ pub fn get_full_forecast(location: WeatherOfficeLocation) -> Vec<WeatherPeriod> 
         .expect("Unable to get data")
         .text().unwrap().to_string();
     let json: ForecastWrapper = serde_json::from_str(&forecast).expect("JSON was not well-formatted");
-    let weather_periods: Vec<WeatherPeriod> = json.properties.periods.into_iter().collect();
-    let icon_forecasts = enhance_forecasts(weather_periods); 
-    icon_forecasts
-}
-
-pub fn enhance_forecasts(mut periods: Vec<WeatherPeriod>) -> Vec<WeatherPeriod> {
-    for period in periods.iter_mut() {
+    let mut weather_periods: Vec<WeatherPeriod> = json.properties.periods.into_iter().collect();
+    for period in weather_periods.iter_mut() {
         let icon = detect_icon(&period.short_forecast).unwrap();
-        let icon_forecast = format!("{} {}", icon, &period.detailed_forecast);
-        period.detailed_forecast = icon_forecast;
+        period.detailed_forecast = format!("{} {}", icon, &period.detailed_forecast);
     }
-    periods
+    weather_periods
 }
 
 pub fn detect_icon(short_forecast: &String) -> Option<char> {
