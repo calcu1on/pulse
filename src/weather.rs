@@ -17,7 +17,7 @@ struct Properties {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WeatherPeriod {
     pub name: String,
-    pub temperature: u64,
+    pub temperature: i32,
     pub wind_direction: String,
     pub wind_speed: String,
     pub detailed_forecast: String,
@@ -54,29 +54,17 @@ pub fn get_full_forecast(location: WeatherOfficeLocation) -> Vec<WeatherPeriod> 
         .text().unwrap().to_string();
     let json: ForecastWrapper = serde_json::from_str(&forecast).expect("JSON was not well-formatted");
     let weather_periods: Vec<WeatherPeriod> = json.properties.periods.into_iter().collect();
-    let icon_forecasts = enhance_forecasts(&weather_periods); 
-
+    let icon_forecasts = enhance_forecasts(weather_periods); 
     icon_forecasts
 }
 
-pub fn enhance_forecasts(periods: &Vec<WeatherPeriod>) -> Vec<WeatherPeriod> {
-    let mut rebuilt_periods: Vec<WeatherPeriod> = vec![];
-    for period in periods {
+pub fn enhance_forecasts(mut periods: Vec<WeatherPeriod>) -> Vec<WeatherPeriod> {
+    for period in periods.iter_mut() {
         let icon = detect_icon(&period.short_forecast).unwrap();
         let icon_forecast = format!("{} {}", icon, &period.detailed_forecast);
-        let rebuilt_period = WeatherPeriod {
-            name: period.name.to_string(),
-            temperature: period.temperature,
-            wind_direction: period.wind_direction.to_string(),
-            wind_speed: period.wind_speed.to_string(),
-            detailed_forecast: icon_forecast,
-            short_forecast: period.short_forecast.to_string(),
-            start_time: period.start_time.to_string(),     
-        };
-        rebuilt_periods.push(rebuilt_period);
+        period.detailed_forecast = icon_forecast;
     }
-
-    rebuilt_periods
+    periods
 }
 
 pub fn detect_icon(short_forecast: &String) -> Option<char> {

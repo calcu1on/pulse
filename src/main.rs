@@ -1,6 +1,7 @@
 #![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 mod weather;
 mod redsox;
+use colored::Colorize;
 use tabled::{Table, Tabled};
 use serde::{Deserialize, Serialize};
 use tabled::settings::{
@@ -12,14 +13,14 @@ use tabled::settings::{
 struct TableRow {
     date: String,
     time_of_day: String,
-    temp: u64,
+    temp: i32,
     red_sox: String,
     forecast: String,
 }
 
 #[allow(unreachable_code)]
 fn main() {
-    let baseball_diamond = '\u{f15ec}';
+    let baseball_diamond = '\u{f0852}';
     // Set the weather location here.
     let location = weather::WeatherOfficeLocation {
         x: 75,
