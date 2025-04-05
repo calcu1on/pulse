@@ -52,13 +52,18 @@ pub fn get_full_forecast(location: WeatherOfficeLocation) -> Vec<WeatherPeriod> 
         .send()
         .expect("Unable to get data")
         .text().unwrap().to_string();
-    let json: ForecastWrapper = serde_json::from_str(&forecast).expect("JSON was not well-formatted");
-    let mut weather_periods: Vec<WeatherPeriod> = json.properties.periods.into_iter().collect();
-    for period in weather_periods.iter_mut() {
-        let icon = detect_icon(&period.short_forecast).unwrap();
-        period.detailed_forecast = format!("{} {}", icon, &period.detailed_forecast);
+    let ForecastWrapper { properties: Properties { mut periods } } = serde_json::from_str(&forecast).expect("JSON was not well-formatted");
+    // let json: ForecastWrapper = serde_json::from_str(&forecast).expect("JSON was not well-formatted");
+    // let mut weather_periods: Vec<WeatherPeriod> = json.properties.periods.into_iter().collect();
+    for period in periods.iter_mut() {
+        match detect_icon(&period.short_forecast) {
+            None => println!("There was an issue detecting the correct icon!!!"),
+            Some(icon) => {
+                period.detailed_forecast = format!("{} {}", icon, &period.detailed_forecast);
+            }
+        };
     }
-    weather_periods
+    periods
 }
 
 pub fn detect_icon(short_forecast: &String) -> Option<char> {
@@ -93,6 +98,13 @@ pub fn detect_icon(short_forecast: &String) -> Option<char> {
     else if short_forecast.contains("Cloudy") {
         let icon = nerdfont::NerdFontIcon {
             icon_code: "e312".to_string(),
+        };
+        let icon_code = icon.get_icon();
+        icon_code
+    }
+    else if short_forecast.contains("Clear") {
+        let icon = nerdfont::NerdFontIcon {
+            icon_code: "e30d".to_string(),
         };
         let icon_code = icon.get_icon();
         icon_code
