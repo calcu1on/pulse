@@ -23,10 +23,8 @@ pub struct Date {
 pub struct Game {
     pub season: String,
     pub teams: Teams,
-    // pub date: String,
     pub official_date: String,
     pub game_date: String,
-    // pub opponent: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
