@@ -1,11 +1,9 @@
 use serde::{Deserialize, Serialize};
 use serde_alias::serde_alias;
 use std::fs;
-use iso8601;
+// use iso8601;
 
-const SOX_ID: i32 = 111;
-const SOX_SCHEDULE_URL: &str = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=111&startDate=2025-04-01&endDate=2025-09-30";
-const SOX_SCHEDULE_LOCAL: &str = "/Users/danchadwick/Projects/rust/pulse/assets/mlb-response.json";
+const TEAM_ID: i32 = 111;
 
 #[serde_alias(CamelCase,SnakeCase)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -68,11 +66,9 @@ pub struct GameInfo {
 // Gets the full forecast from the response.
 pub fn get_schedule() -> Vec<GameInfo> {
     let client = reqwest::blocking::Client::new();
-    // let schedule_json: String = fs::read_to_string(SOX_SCHEDULE_LOCAL).expect("Unable to read file").to_owned();
-    let schedule_json: String = client.get(SOX_SCHEDULE_URL).send().expect("Unable to get data").text().unwrap().to_string();
+    let schedule_url = build_api_url();
+    let schedule_json: String = client.get(&schedule_url).send().expect("Unable to get data").text().unwrap().to_string();
     let schedule: Schedule = serde_json::from_str(&schedule_json).expect("JSON was not well-formatted");
-    // Iterate over the schedule, extract datapoints to create new struct
-    // Return a vec of the new structs.
     let mut full_schedule: Vec<GameInfo> = vec![];
     let dates = schedule.dates;
     for date in dates {
@@ -88,6 +84,7 @@ pub fn get_schedule() -> Vec<GameInfo> {
     full_schedule
 }
 
+// Determine who the opponent is from the teams.
 pub fn extract_opponent(teams: &Teams) -> String {
     if teams.home.team.name == "Boston Red Sox" {
         teams.away.team.name.to_string()
@@ -97,10 +94,16 @@ pub fn extract_opponent(teams: &Teams) -> String {
     }
 }
 
-#[cfg(test)]
-mod sox_tests {
-    use super::*;
+// Build the url for the api request.
+fn build_api_url() -> String {
+    let url_first: String = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=".to_string();
+    let url_second: String= "&startDate=2025-04-01&endDate=2025-09-30".to_string();
+    format!("{}{}{}", url_first, TEAM_ID, url_second)
+}
 
+#[cfg(test)]
+mod team_tests {
+    use super::*;
     #[test]
     fn check_schedule_retrieval() {
         get_schedule();
