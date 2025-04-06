@@ -1,6 +1,7 @@
 mod weather;
 mod redsox;
-mod nerdfont;
+mod icons;
+use icons::Icons;
 use tabled::{Table, Tabled};
 use serde::{Deserialize, Serialize};
 use tabled::settings::{
@@ -18,22 +19,17 @@ struct TableRow {
 }
 
 fn main() {
-    // Get forecast.
+    // Get forecast & schedule.
     let entire_forecast: Vec<weather::WeatherPeriod> = weather::WeatherOfficeLocation {
         x: 75,
         y: 59,
         code: "GYX".to_string(),
     }.get_full_forecast();
-    // Get sox schedule.
     let sox_games: Vec<redsox::GameInfo> = redsox::get_schedule();
     // Build icons.
-    let baseball_icon = nerdfont::NerdFontIcon { 
-        icon_code: "f0852".to_string(),
-    }.get_icon().unwrap();
-    let clock_icon = nerdfont::NerdFontIcon {
-        icon_code: "e641".to_string(),
-    }.get_icon().unwrap();
-
+    let baseball_icon = Icons::Baseball.get_icon_str();
+    let clock_icon = Icons::Clock.get_icon_str();
+    let fahrenheight_icon = Icons::Fahrenheight.get_icon_str();
     // Build the rows for the table.
     let mut table_rows: Vec<TableRow> = vec![];
     for i in 0..entire_forecast.len() {
@@ -43,20 +39,10 @@ fn main() {
         // Check if there is a sox game and print opp.
         for sox_game in &sox_games {
             if sox_game.date == yyyy_mm_dd {
-                sox_status = format!(
-                    "{} {}\n{} {}",
-                    &baseball_icon,
-                    &sox_game.opponent,
-                    &clock_icon, 
-                    &sox_game.start_time,
-                );
+                sox_status = format!("{} {}\n{} {}", &baseball_icon, &sox_game.opponent, &clock_icon, &sox_game.start_time);
                 break;
             }
         }
-        // Get fahrenheight icon;
-        let fahrenheight_icon = nerdfont::NerdFontIcon {
-            icon_code: "e341".to_string(),
-        }.get_icon().unwrap();
         let row = TableRow {
             date: yyyy_mm_dd.to_string(),
             time_of_day: forecast_period.name.clone(),

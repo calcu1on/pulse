@@ -1,7 +1,8 @@
 use reqwest::header::USER_AGENT;
 use serde::{Deserialize, Serialize};
 use serde_alias::serde_alias;
-#[path = "nerdfont.rs"] mod nerdfont;
+#[path = "icons.rs"] mod icons;
+use icons::Icons;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ForecastWrapper {
@@ -52,7 +53,11 @@ impl WeatherOfficeLocation {
             .send()
             .expect("Unable to get data")
             .text().unwrap().to_string();
-        let ForecastWrapper { properties: Properties { mut periods } } = serde_json::from_str(&forecast).expect("JSON was not well-formatted");
+        let ForecastWrapper { 
+            properties: Properties { 
+                mut periods 
+            } 
+        } = serde_json::from_str(&forecast).expect("JSON was not well-formatted");
         for period in periods.iter_mut() {
             match detect_icon(&period.short_forecast) {
                 None => println!("There was an issue detecting the correct icon!!!"),
@@ -66,45 +71,16 @@ impl WeatherOfficeLocation {
 }
 
 // Detect which icon to display based on short forecast.
-pub fn detect_icon(short_forecast: &String) -> Option<char> {
-    if short_forecast.contains("Sunny") {
-        let icon = nerdfont::NerdFontIcon {
-            icon_code: "f0599".to_string(),
-        };
-        let icon_code = icon.get_icon();
-        icon_code
-    } else if short_forecast.contains("Rain") && short_forecast.contains("Snow") {
-        let icon = nerdfont::NerdFontIcon {
-            icon_code: "f067f".to_string(),
-        };
-        let icon_code = icon.get_icon();
-        icon_code
-    } else if short_forecast.contains("Snow") {
-        let icon = nerdfont::NerdFontIcon {
-            icon_code: "f0f36".to_string(),
-        };
-        let icon_code = icon.get_icon();
-        icon_code
-    } else if short_forecast.contains("Rain") {
-        let icon = nerdfont::NerdFontIcon {
-            icon_code: "e239".to_string(),
-        };
-        let icon_code = icon.get_icon();
-        icon_code
-    } else if short_forecast.contains("Cloudy") {
-        let icon = nerdfont::NerdFontIcon {
-            icon_code: "e312".to_string(),
-        };
-        let icon_code = icon.get_icon();
-        icon_code
-    } else if short_forecast.contains("Clear") {
-        let icon = nerdfont::NerdFontIcon {
-            icon_code: "e30d".to_string(),
-        };
-        let icon_code = icon.get_icon();
-        icon_code
-    } else {
-        None
+pub fn detect_icon(short_forecast: &str) -> Option<String> {
+    match true {
+        _ if short_forecast.contains("Sunny") => Some(Icons::Sunny.get_icon_str()),
+        _ if short_forecast.contains("Rain") && short_forecast.contains("Snow") => {
+            Some(Icons::Mixed.get_icon_str())
+        }
+        _ if short_forecast.contains("Snow") => Some(Icons::Snow.get_icon_str()),
+        _ if short_forecast.contains("Rain") => Some(Icons::Rain.get_icon_str()),
+        _ if short_forecast.contains("Cloudy") => Some(Icons::Cloudy.get_icon_str()),
+        _ if short_forecast.contains("Clear") => Some(Icons::Clear.get_icon_str()),
+        _ => None,
     }
 }
-
