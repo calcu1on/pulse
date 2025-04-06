@@ -1,8 +1,6 @@
-#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 mod weather;
 mod redsox;
 mod nerdfont;
-// use colored::Colorize;
 use tabled::{Table, Tabled};
 use serde::{Deserialize, Serialize};
 use tabled::settings::{
@@ -19,7 +17,6 @@ struct TableRow {
     forecast: String,
 }
 
-#[allow(unreachable_code)]
 fn main() {
     // Get forecast.
     let entire_forecast: Vec<weather::WeatherPeriod> = weather::WeatherOfficeLocation {
