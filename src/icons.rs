@@ -1,6 +1,6 @@
 #[allow(dead_code)]
 pub enum Icons {
-    Fahrenheight,
+    Fahrenheit,
     Clock,
     Baseball,
     Sunny,
@@ -15,7 +15,7 @@ impl Icons {
 
     pub fn get_icon_str(&self) -> String {
         match self {
-            Icons::Fahrenheight => Self::get_icon("e341").unwrap().to_string(),
+            Icons::Fahrenheit => Self::get_icon("e341").unwrap().to_string(),
             Icons::Clock => Self::get_icon("e641").unwrap().to_string(),
             Icons::Baseball => Self::get_icon("f0852").unwrap().to_string(),
             Icons::Sunny => Self::get_icon("f0599").unwrap().to_string(),

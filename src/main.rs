@@ -29,7 +29,7 @@ fn main() {
     // Build icons.
     let baseball_icon = Icons::Baseball.get_icon_str();
     let clock_icon = Icons::Clock.get_icon_str();
-    let fahrenheight_icon = Icons::Fahrenheight.get_icon_str();
+    let fahrenheit_icon = Icons::Fahrenheit.get_icon_str();
     // Build the rows for the table.
     let mut table_rows: Vec<TableRow> = vec![];
     for i in 0..entire_forecast.len() {
@@ -46,7 +46,7 @@ fn main() {
         let row = TableRow {
             date: yyyy_mm_dd.to_string(),
             time_of_day: forecast_period.name.clone(),
-            temp: format!("{}{}", forecast_period.temperature, fahrenheight_icon),
+            temp: format!("{}{}", forecast_period.temperature, fahrenheit_icon),
             red_sox: sox_status,
             forecast: forecast_period.detailed_forecast.to_string(),
         };
