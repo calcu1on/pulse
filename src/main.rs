@@ -43,8 +43,13 @@ fn main() {
         // Check if there is a sox game and print opp.
         for sox_game in &sox_games {
             if sox_game.date == yyyy_mm_dd {
-                // @todo - currently hardcoding time - figure out how to get it.
-                sox_status = format!("{} {}\n{} {}", baseball_icon, &sox_game.opponent, clock_icon, "8:00".to_string());
+                sox_status = format!(
+                    "{} {}\n{} {}",
+                    &baseball_icon,
+                    &sox_game.opponent,
+                    &clock_icon, 
+                    &sox_game.start_time,
+                );
                 break;
             }
         }

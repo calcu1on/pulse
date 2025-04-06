@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_alias::serde_alias;
-// use iso8601;
+use chrono::{DateTime, Utc};
+use chrono_tz::US::Eastern;
 
 const TEAM_ID: i32 = 111;
 
@@ -24,7 +25,7 @@ pub struct Game {
     pub teams: Teams,
     // pub date: String,
     pub official_date: String,
-    // pub start_time: String,
+    pub game_date: String,
     // pub opponent: String,
 }
 
@@ -59,7 +60,7 @@ pub struct TeamRecord {
 pub struct GameInfo {
     pub opponent: String,
     pub date: String,
-    // pub time: String,
+    pub start_time: String,
 }
 
 // Gets the full forecast from the response.
@@ -76,6 +77,7 @@ pub fn get_schedule() -> Vec<GameInfo> {
             let game_info = GameInfo {
                 opponent: facing,
                 date: game.official_date,
+                start_time: get_start_time(&game.game_date),
             };
             full_schedule.push(game_info);
         }
@@ -98,6 +100,12 @@ fn build_api_url() -> String {
     let url_first: String = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=".to_string();
     let url_second: String= "&startDate=2025-04-01&endDate=2025-09-30".to_string();
     format!("{}{}{}", url_first, TEAM_ID, url_second)
+}
+
+fn get_start_time(iso_string: &String) -> String {
+    let utc_dt: DateTime<Utc> = iso_string.parse().expect("Invalid ISO8601 string");
+    let est_dt = utc_dt.with_timezone(&Eastern);
+    est_dt.format("%I:%M").to_string()
 }
 
 #[cfg(test)]
