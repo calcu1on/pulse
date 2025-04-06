@@ -61,7 +61,7 @@ fn render_table(rows: &Vec<TableRow>) {
     table.with((Style::modern(), Alignment::center()));
     table.modify(Columns::last(), Alignment::left());
     table.with((
-            Width::wrap(195).priority(Priority::max(true)),
+            Width::wrap(200).priority(Priority::max(true)),
             Width::increase(60).priority(Priority::min(true)),
     ));
     table.modify(Columns::single(3), Alignment::left());
